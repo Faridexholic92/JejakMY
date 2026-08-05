@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ms">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Jejak - jejak semua parcel di satu tempat</title>
+		<link rel="stylesheet" href="/styles.css" />
+	</head>
+	<body>
+		<main class="shell">
+			<header class="topbar">
+				<div class="brand">
+					<span class="brand-mark" aria-hidden="true">J</span>
+					<span>Jejak</span>
+				</div>
+				<div class="live" id="live" data-state="connecting">
+					<span class="dot" aria-hidden="true"></span>
+					<span id="live-text">Menyambung…</span>
+				</div>
+			</header>
+
+			<section class="panel" aria-labelledby="add-title">
+				<h1 id="add-title" style="margin: 0 0 4px; font-size: 22px">Jejak parcel baharu</h1>
+				<p style="margin: 0 0 18px; color: var(--muted); font-size: 14px">
+					Taip nombor tracking. Kurier dikesan automatik, dan kalau kabur kami
+					cuba setiap calon sehingga ada yang menjawab.
+				</p>
+				<form id="add-form" class="add-row" autocomplete="off">
+					<div class="field">
+						<label for="tracking">Nombor tracking</label>
+						<input id="tracking" name="tracking" type="text" placeholder="630123456789" required />
+					</div>
+					<div class="field">
+						<label for="nickname">Nama panggilan (pilihan)</label>
+						<input id="nickname" name="nickname" type="text" placeholder="Kasut Raya" />
+					</div>
+					<div class="field" style="flex: 0 0 auto; justify-content: flex-end">
+						<button class="btn" id="add-btn" type="submit">Jejak</button>
+					</div>
+				</form>
+				<div class="detect" id="detect" aria-live="polite"></div>
+				<div class="form-error" id="form-error" hidden></div>
+			</section>
+
+			<section class="stats" id="stats" aria-label="Ringkasan"></section>
+
+			<div class="section-head">
+				<h2>Parcel kau</h2>
+				<div class="filters" id="filters" role="group" aria-label="Tapis parcel">
+					<button type="button" data-filter="all" aria-pressed="true">Semua</button>
+					<button type="button" data-filter="active" aria-pressed="false">Dalam perjalanan</button>
+					<button type="button" data-filter="attention" aria-pressed="false">Perlu tindakan</button>
+					<button type="button" data-filter="done" aria-pressed="false">Selesai</button>
+				</div>
+			</div>
+
+			<div class="cards" id="cards"></div>
+
+			<p class="footnote">
+				Data datang dari enjin Jejak yang sedang berjalan di komputer ini.
+				Poller mengemas kini sendiri; halaman ini menerima perubahan secara langsung.
+			</p>
+		</main>
+
+		<div class="drawer-backdrop" id="backdrop" data-open="false"></div>
+		<aside class="drawer" id="drawer" data-open="false" aria-labelledby="drawer-title" aria-hidden="true">
+			<div class="drawer-head">
+				<div>
+					<h3 id="drawer-title">Parcel</h3>
+					<div class="sub" id="drawer-sub"></div>
+				</div>
+				<button class="btn secondary" id="drawer-close" type="button" aria-label="Tutup">Tutup</button>
+			</div>
+			<div class="drawer-actions">
+				<button class="btn secondary" id="refresh-btn" type="button">Kemas kini sekarang</button>
+				<button class="btn danger" id="delete-btn" type="button">Buang</button>
+			</div>
+			<div class="meta" id="drawer-meta"></div>
+			<ol class="timeline" id="timeline"></ol>
+		</aside>
+
+		<script src="/app.js" type="module"></script>
+	</body>
+</html>
