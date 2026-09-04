@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="ms" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Urus Paparan Awam &middot; MySPD</title>
+<meta name="robots" content="noindex">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/js/portal-config.js"></script>
+<style>
+:root{--bg:#0b1220;--card:#131f33;--card2:#0f1a2e;--line:#1e2d47;
+--text:#f0f6ff;--muted:#7a8fad;--blue:#3b82f6;--green:#10b981;
+--red:#ef4444;--amber:#f59e0b;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);
+font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;line-height:1.6;}
+a{color:var(--blue);}
+.top{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.94);
+border-bottom:1px solid var(--line);padding:13px 20px;display:flex;
+align-items:center;gap:12px;backdrop-filter:blur(6px);}
+.top .logo{width:34px;height:34px;border-radius:9px;background:var(--blue);
+display:flex;align-items:center;justify-content:center;font-weight:800;
+font-size:13px;flex-shrink:0;}
+.top .nm{font-weight:800;font-size:14px;letter-spacing:.02em;}
+.top .sk{font-size:11px;color:var(--muted);}
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 60px;}
+h2.sec{font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+color:var(--muted);font-weight:800;margin:34px 0 14px;
+border-bottom:1px solid var(--line);padding-bottom:9px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:15px 17px;margin-bottom:12px;}
+.kosong{color:var(--muted);font-size:12.5px;padding:16px 0;}
+.btn{background:var(--card2);color:var(--text);border:1px solid var(--line);
+border-radius:9px;padding:9px 14px;font-size:12.5px;cursor:pointer;
+font-family:inherit;}
+.btn.pri{background:var(--blue);border-color:var(--blue);font-weight:700;}
+.btn.bahaya{background:transparent;border-color:var(--red);color:var(--red);}
+.btn:hover{filter:brightness(1.15);}
+.hide{display:none !important;}
+.nota{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5;}
+#gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:15px;padding:22px;text-align:center;}
+.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--blue);
+border-radius:50%;animation:sp .8s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+#gate .gt{font-size:12px;color:var(--muted);letter-spacing:.12em;
+text-transform:uppercase;font-weight:700;}
+.tabs{display:flex;gap:7px;margin:22px 0 18px;flex-wrap:wrap;}
+.tab{background:var(--card2);border:1px solid var(--line);color:var(--muted);
+border-radius:9px;padding:9px 15px;font-size:12.5px;cursor:pointer;
+font-family:inherit;font-weight:700;}
+.tab.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+.fld{margin-bottom:11px;}
+.fld label{display:block;font-size:11px;color:var(--muted);font-weight:700;
+letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+.fld input,.fld textarea{width:100%;background:var(--card2);color:var(--text);
+border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:13px;
+font-family:inherit;}
+.fld textarea{resize:vertical;min-height:72px;}
+.duo{display:flex;gap:11px;flex-wrap:wrap;}
+.duo .fld{flex:1;min-width:150px;}
+.chk{display:flex;align-items:center;gap:9px;font-size:12.5px;
+color:var(--muted);margin-bottom:11px;cursor:pointer;}
+.chk input{width:15px;height:15px;accent-color:var(--blue);}
+.msg{padding:10px 13px;border-radius:9px;font-size:12px;margin-bottom:12px;}
+.msg.ok{background:rgba(16,185,129,.1);color:var(--green);
+border:1px solid rgba(16,185,129,.28);}
+.msg.no{background:rgba(239,68,68,.1);color:var(--red);
+border:1px solid rgba(239,68,68,.28);}
+.baris{display:flex;gap:12px;align-items:center;}
+.baris img{width:62px;height:46px;object-fit:cover;border-radius:7px;
+background:var(--card2);flex-shrink:0;}
+.baris .isi{flex:1;min-width:0;}
+.baris .tj{font-weight:700;font-size:13px;}
+.baris .mt{font-size:11.5px;color:var(--muted);}
+.baris .act{display:flex;gap:6px;flex-shrink:0;}
+.pil{font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;
+letter-spacing:.07em;text-transform:uppercase;}
+.pil.papar{background:rgba(16,185,129,.14);color:var(--green);
+border:1px solid rgba(16,185,129,.3);}
+.pil.sorok{background:rgba(122,143,173,.14);color:var(--muted);
+border:1px solid var(--line);}
+@media(max-width:640px){.wrap{padding:18px 14px 46px;}
+.baris{flex-wrap:wrap;}.baris .act{width:100%;}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="spin"></div>
+  <div class="gt" id="gateTxt">Mengesahkan sesi</div>
+</div>
+
+<div id="app" class="hide">
+
+  <div class="top">
+    <div class="logo">SPD</div>
+    <div style="flex:1">
+      <div class="nm">Urus Paparan Awam</div>
+      <div class="sk">Apa yang kau simpan di sini akan naik ke halaman awam</div>
+    </div>
+    <a class="btn" href="/awam/" target="_blank" rel="noopener">Lihat halaman awam</a>
+  </div>
+
+  <div class="wrap">
+
+    <div class="tabs">
+      <button class="tab on" id="tabGaleri"     onclick="setTab('galeri')">Galeri</button>
+      <button class="tab"    id="tabPengumuman" onclick="setTab('pengumuman')">Pengumuman</button>
+      <button class="tab"    id="tabAcara"      onclick="setTab('acara')">Kalendar Aktiviti</button>
+    </div>
+
+    <div id="msg"></div>
+
+    <!-- ===================== GALERI ===================== -->
+    <section id="vGaleri">
+      <div class="card">
+        <div class="fld">
+          <label>Gambar (muat naik ke storan portal)</label>
+          <input type="file" id="g_fail" accept="image/*">
+        </div>
+        <div class="fld">
+          <label>Atau tampal pautan Google Drive / URL gambar</label>
+          <input id="g_pautan" placeholder="https://drive.google.com/file/d/....../view">
+          <div class="nota">Kongsi fail Drive sebagai &quot;Anyone with the link&quot; dahulu.
+            Pautan biasa akan ditukar ke format paparan terus secara automatik.
+            Isi salah satu sahaja - fail ATAU pautan.</div>
+        </div>
+        <div class="fld"><label>Tajuk</label><input id="g_tajuk" maxlength="120"></div>
+        <div class="duo">
+          <div class="fld"><label>Tarikh</label><input type="date" id="g_tarikh"></div>
+          <div class="fld"><label>Susunan (besar = atas)</label>
+            <input type="number" id="g_susunan" value="0"></div>
+        </div>
+        <div class="fld"><label>Keterangan</label><textarea id="g_ket"></textarea></div>
+        <label class="chk"><input type="checkbox" id="g_papar" checked>
+          <span>Papar kepada pengunjung</span></label>
+        <div class="act">
+          <button class="btn pri" id="g_btn" onclick="simpanGaleri()">Simpan gambar</button>
+          <button class="btn hide act-batal" id="g_batal" data-j="awam_galeri">Batal ubah</button>
+        </div>
+        <div class="nota" id="g_mod"></div>
+      </div>
+      <div id="lsGaleri"></div>
+    </section>
+
+    <!-- =================== PENGUMUMAN =================== -->
+    <section id="vPengumuman" class="hide">
+      <div class="card">
+        <div class="fld"><label>Tajuk</label><input id="p_tajuk" maxlength="160"></div>
+        <div class="fld"><label>Tarikh</label><input type="date" id="p_tarikh"></div>
+        <div class="fld"><label>Teks</label><textarea id="p_teks"></textarea></div>
+
+        <!-- POSTER HERO: boleh lebih daripada satu. Poster pertama jadi utama,
+             selebihnya jadi carousel di Laman Awam. -->
+        <div class="fld">
+          <label>Poster hero (boleh pilih beberapa fail)</label>
+          <input type="file" id="p_fail" accept="image/*" multiple>
+          <div class="nota">Poster jadi latar penuh slaid pengumuman di Laman Awam.
+            Pilih beberapa fail sekali gus untuk buat carousel.
+            Saiz disyorkan 1080&times;1350 (portrait) atau 1600&times;900 (landskap).
+            Had 5 MB setiap fail.</div>
+        </div>
+        <div class="fld">
+          <label>Atau tambah melalui pautan</label>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <input id="p_pautan" placeholder="https://drive.google.com/file/d/....../view"
+              style="flex:1 1 auto">
+            <button type="button" class="btn" onclick="posterTambahPautan()"
+              style="flex:0 0 auto">Tambah</button>
+          </div>
+          <div class="nota">Tekan Tambah untuk masukkan pautan ke dalam senarai poster.</div>
+        </div>
+        <div class="fld hide" id="p_senaraiWrap">
+          <label>Senarai poster <span id="p_bil" class="pil"></span></label>
+          <div id="p_senarai"></div>
+          <div class="nota">Poster pertama adalah poster utama.
+            Guna anak panah untuk susun semula.</div>
+        </div>
+        <label class="chk"><input type="checkbox" id="p_penting">
+          <span>Tanda sebagai penting</span></label>
+        <label class="chk"><input type="checkbox" id="p_papar" checked>
+          <span>Papar kepada pengunjung</span></label>
+        <div class="act">
+          <button class="btn pri" id="p_btn" onclick="simpanPengumuman()">Simpan pengumuman</button>
+          <button class="btn hide act-batal" id="p_batal" data-j="awam_pengumuman">Batal ubah</button>
+        </div>
+        <div class="nota" id="p_mod"></div>
+      </div>
+      <div id="lsPengumuman"></div>
+    </section>
+
+    <!-- ===================== ACARA ====================== -->
+    <section id="vAcara" class="hide">
+      <div class="card">
+        <div class="fld"><label>Nama aktiviti</label><input id="a_nama" maxlength="160"></div>
+        <div class="duo">
+          <div class="fld"><label>Tarikh mula</label><input type="date" id="a_mula"></div>
+          <div class="fld"><label>Tarikh tamat (pilihan)</label>
+            <input type="date" id="a_tamat"></div>
+        </div>
+        <div class="fld"><label>Lokasi</label><input id="a_lokasi" maxlength="160"></div>
+        <div class="fld"><label>Keterangan</label><textarea id="a_ket"></textarea></div>
+        <label class="chk"><input type="checkbox" id="a_papar" checked>
+          <span>Papar kepada pengunjung</span></label>
+        <div class="act">
+          <button class="btn pri" id="a_btn" onclick="simpanAcara()">Simpan aktiviti</button>
+          <button class="btn hide act-batal" id="a_batal" data-j="awam_acara">Batal ubah</button>
+        </div>
+        <div class="nota" id="a_mod"></div>
+      </div>
+      <div id="lsAcara"></div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+var C  = window.PORTAL_CONFIG;
+var sb = supabase.createClient(C.supabaseUrl, C.anonKey);
+var ME = null, PENGURUS = false;
+
+function el(i){ return document.getElementById(i); }
+function esc(s){
+  return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+function tkh(d){
+  if(!d) return '';
+  var p = String(d).slice(0,10).split('-');
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+function hariIni(){ return new Date().toISOString().slice(0,10); }
+function lapor(t, jenis){
+  el('msg').innerHTML = '<div class="msg ' + (jenis || 'ok') + '">' + esc(t) + '</div>';
+  if(jenis !== 'no') setTimeout(function(){ el('msg').innerHTML = ''; }, 4000);
+}
+
+/* ---------------------- PAGAR SESI ---------------------- */
+sb.auth.getSession().then(function(res){
+  var s = res.data && res.data.session;
+  if(!s){
+    el('gateTxt').innerHTML = 'Sesi tidak ditemui.<br><a href="/">Log masuk di portal</a>';
+    el('gate').querySelector('.spin').classList.add('hide');
+    return null;
+  }
+  ME = s.user;
+  return sb.from('profiles').select('role, nama').eq('id', ME.id).single();
+}).then(function(r){
+  if(!r) return;
+  var peranan = r.data ? r.data.role : null;
+  PENGURUS = (peranan === 'superadmin');
+  if(!PENGURUS){
+    el('gateTxt').innerHTML =
+      'Halaman ini untuk Superadmin sahaja.<br><a href="/">Balik ke portal</a>';
+    el('gate').querySelector('.spin').classList.add('hide');
+    return;
+  }
+  el('gate').classList.add('hide');
+  el('app').classList.remove('hide');
+  el('g_tarikh').value = hariIni();
+  el('p_tarikh').value = hariIni();
+  el('a_mula').value   = hariIni();
+  muatSemua();
+}).catch(function(e){
+  el('gateTxt').textContent = 'Ralat: ' + (e && e.message ? e.message : e);
+});
+
+/* ------------------------- TAB -------------------------- */
+function setTab(t){
+  ['Galeri','Pengumuman','Acara'].forEach(function(n){
+    var kunci = n.toLowerCase();
+    el('tab' + n).classList.toggle('on', kunci === t);
+    el('v' + n).classList.toggle('hide', kunci !== t);
+  });
+}
+window.setTab = setTab;
+
+/* ----------------------- MUAT DATA ---------------------- */
+function muatSemua(){ muatGaleri(); muatPengumuman(); muatAcara(); }
+
+/* -------------------- KEADAAN UBAH ---------------------- */
+/* DATA menyimpan rekod yang sedang dipapar supaya borang boleh
+   diisi semula tanpa panggilan tambahan ke pangkalan data.
+   EDIT menyimpan id rekod yang sedang diubah bagi setiap jadual;
+   null bermakna borang itu dalam mod tambah baharu. */
+var DATA = { awam_galeri: [], awam_pengumuman: [], awam_acara: [] };
+var EDIT = { awam_galeri: null, awam_pengumuman: null, awam_acara: null };
+
+/* Tukar pautan Google Drive biasa kepada URL yang boleh dipapar
+   terus sebagai <img>. Pautan lain dikembalikan seadanya. */
+function pautanImej(nilai){
+  var s = (nilai || '').trim();
+  if(!s) return '';
+  var m = s.match(/drive[.]google[.]com\/file\/d\/([A-Za-z0-9_-]{10,})/) ||
+          s.match(/drive[.]google[.]com\/open[?]id=([A-Za-z0-9_-]{10,})/) ||
+          s.match(/[?&]id=([A-Za-z0-9_-]{10,})/);
+  if(m) return 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1600';
+  return s;
+}
+
+function cariRekod(jadual, id){
+  var a = DATA[jadual] || [];
+  for(var i = 0; i < a.length; i++){ if(a[i].id === id) return a[i]; }
+  return null;
+}
+
+function bukaEdit(jadual, id){
+  var x = cariRekod(jadual, id);
+  if(!x) return lapor('Rekod tidak dijumpai. Muat semula halaman.', 'no');
+  EDIT[jadual] = id;
+
+  if(jadual === 'awam_galeri'){
+    el('g_fail').value    = '';
+    el('g_pautan').value  = '';
+    el('g_tajuk').value   = x.tajuk || '';
+    el('g_ket').value     = x.keterangan || '';
+    el('g_tarikh').value  = x.tarikh || '';
+    el('g_susunan').value = (x.susunan === null || x.susunan === undefined) ? 0 : x.susunan;
+    el('g_papar').checked = !!x.papar;
+    el('g_btn').textContent = 'Kemas kini gambar';
+    el('g_mod').textContent = 'Sedang mengubah: ' + (x.tajuk || '(tiada tajuk)') +
+      '. Biarkan fail dan pautan kosong jika gambar tidak perlu ditukar.';
+    el('g_batal').classList.remove('hide');
+  } else if(jadual === 'awam_pengumuman'){
+    el('p_tajuk').value     = x.tajuk || '';
+    el('p_tarikh').value    = x.tarikh || '';
+    el('p_teks').value      = x.teks || '';
+    el('p_penting').checked = !!x.penting;
+    el('p_papar').checked   = !!x.papar;
+    el('p_fail').value = ''; el('p_pautan').value = '';
+    POSTER = posterDariRekod(x);
+    posterRender();
+    el('p_btn').textContent = 'Kemas kini pengumuman';
+    el('p_mod').textContent = 'Sedang mengubah: ' + (x.tajuk || '(tiada tajuk)') +
+      '. Poster sedia ada dikekalkan; tambah fail baharu untuk menambah poster.';
+    el('p_batal').classList.remove('hide');
+  } else {
+    el('a_nama').value    = x.nama || '';
+    el('a_mula').value    = x.tarikh_mula || '';
+    el('a_tamat').value   = x.tarikh_tamat || '';
+    el('a_lokasi').value  = x.lokasi || '';
+    el('a_ket').value     = x.keterangan || '';
+    el('a_papar').checked = !!x.papar;
+    el('a_btn').textContent = 'Kemas kini aktiviti';
+    el('a_mod').textContent = 'Sedang mengubah: ' + (x.nama || '(tiada nama)') + '.';
+    el('a_batal').classList.remove('hide');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.bukaEdit = bukaEdit;
+
+function batalEdit(jadual){
+  EDIT[jadual] = null;
+  if(jadual === 'awam_galeri'){
+    el('g_fail').value = ''; el('g_pautan').value = '';
+    el('g_tajuk').value = ''; el('g_ket').value = '';
+    el('g_tarikh').value = ''; el('g_susunan').value = 0;
+    el('g_papar').checked = true;
+    el('g_btn').textContent = 'Simpan gambar';
+    el('g_mod').textContent = '';
+    el('g_batal').classList.add('hide');
+  } else if(jadual === 'awam_pengumuman'){
+    el('p_tajuk').value = ''; el('p_teks').value = ''; el('p_tarikh').value = '';
+    el('p_penting').checked = false; el('p_papar').checked = true;
+    el('p_fail').value = ''; el('p_pautan').value = '';
+    POSTER = [];
+    posterRender();
+    el('p_btn').textContent = 'Simpan pengumuman';
+    el('p_mod').textContent = '';
+    el('p_batal').classList.add('hide');
+  } else {
+    el('a_nama').value = ''; el('a_mula').value = ''; el('a_tamat').value = '';
+    el('a_lokasi').value = ''; el('a_ket').value = '';
+    el('a_papar').checked = true;
+    el('a_btn').textContent = 'Simpan aktiviti';
+    el('a_mod').textContent = '';
+    el('a_batal').classList.add('hide');
+  }
+}
+window.batalEdit = batalEdit;
+
+function pil(x){
+  return x.papar ? '<span class="pil papar">Papar</span>'
+                 : '<span class="pil sorok">Sorok</span>';
+}
+function butang(jadual, x){
+  return '<div class="act">' +
+    '<button class="btn act-edit" data-j="' + jadual + '" data-id="' + x.id +
+      '">Ubah</button>' +
+    '<button class="btn act-togol" data-j="' + jadual + '" data-id="' + x.id +
+      '" data-v="' + (x.papar ? '0' : '1') + '">' +
+      (x.papar ? 'Sorok' : 'Papar') + '</button>' +
+    '<button class="btn bahaya act-padam" data-j="' + jadual + '" data-id="' +
+      x.id + '">Padam</button>' +
+  '</div>';
+}
+
+function muatGaleri(){
+  sb.from('awam_galeri').select('*')
+    .order('susunan', { ascending:false }).order('tarikh', { ascending:false })
+    .then(function(r){
+      if(r.error){ lapor(r.error.message, 'no'); return; }
+      var d = r.data || [];
+      DATA['awam_galeri'] = d;
+      el('lsGaleri').innerHTML = !d.length
+        ? '<div class="kosong">Belum ada gambar.</div>'
+        : d.map(function(x){
+            return '<div class="card"><div class="baris">' +
+              '<img alt="" src="' + esc(x.imej_url) + '">' +
+              '<div class="isi"><div class="tj">' + esc(x.tajuk) + ' ' + pil(x) + '</div>' +
+              '<div class="mt">' + tkh(x.tarikh) +
+                ' &middot; susunan ' + esc(x.susunan) + '</div></div>' +
+              butang('awam_galeri', x) + '</div></div>';
+          }).join('');
+    });
+}
+
+function muatPengumuman(){
+  sb.from('awam_pengumuman').select('*').order('tarikh', { ascending:false })
+    .then(function(r){
+      if(r.error){ lapor(r.error.message, 'no'); return; }
+      var d = r.data || [];
+      DATA['awam_pengumuman'] = d;
+      el('lsPengumuman').innerHTML = !d.length
+        ? '<div class="kosong">Belum ada pengumuman.</div>'
+        : d.map(function(x){
+            return '<div class="card"><div class="baris">' +
+              (x.imej_url
+                ? '<img alt="" src="' + esc(x.imej_url) + '" ' +
+                  'style="width:54px;height:54px;object-fit:cover;border-radius:8px;' +
+                  'flex:0 0 auto;margin-right:10px;border:1px solid #2a3a52;">'
+                : '') +
+              '<div class="isi"><div class="tj">' + esc(x.tajuk) + ' ' + pil(x) +
+                (x.penting ? ' <span class="pil papar">Penting</span>' : '') +
+                (function(){
+                  var n = posterDariRekod(x).length;
+                  if(!n) return ' <span class="pil">Tiada poster</span>';
+                  if(n === 1) return '';
+                  return ' <span class="pil papar">' + n + ' poster</span>';
+                })() + '</div>' +
+              '<div class="mt">' + tkh(x.tarikh) + '</div></div>' +
+              butang('awam_pengumuman', x) + '</div></div>';
+          }).join('');
+    });
+}
+
+function muatAcara(){
+  sb.from('awam_acara').select('*').order('tarikh_mula', { ascending:false })
+    .then(function(r){
+      if(r.error){ lapor(r.error.message, 'no'); return; }
+      var d = r.data || [];
+      DATA['awam_acara'] = d;
+      el('lsAcara').innerHTML = !d.length
+        ? '<div class="kosong">Belum ada aktiviti.</div>'
+        : d.map(function(x){
+            return '<div class="card"><div class="baris">' +
+              '<div class="isi"><div class="tj">' + esc(x.nama) + ' ' + pil(x) + '</div>' +
+              '<div class="mt">' + tkh(x.tarikh_mula) +
+                (x.tarikh_tamat ? ' hingga ' + tkh(x.tarikh_tamat) : '') +
+                (x.lokasi ? ' &middot; ' + esc(x.lokasi) : '') + '</div></div>' +
+              butang('awam_acara', x) + '</div></div>';
+          }).join('');
+    });
+}
+
+/* ----------------- SIMPAN / KEMAS KINI ------------------ */
+/* Setiap fungsi berkhidmat untuk dua mod: bila EDIT[jadual] kosong
+   ia memasukkan rekod baharu, bila ada id ia mengemas kini rekod itu. */
+
+function simpanGaleri(){
+  var jadual = 'awam_galeri';
+  var ubah   = EDIT[jadual];
+  var fail   = el('g_fail').files[0];
+  var pautan = pautanImej(el('g_pautan').value);
+  var tajuk  = el('g_tajuk').value.trim();
+
+  if(!tajuk) return lapor('Tajuk wajib diisi.', 'no');
+  if(fail && pautan)
+    return lapor('Pilih fail ATAU pautan, bukan kedua-duanya.', 'no');
+  if(!ubah && !fail && !pautan)
+    return lapor('Pilih fail gambar atau tampal pautan Google Drive.', 'no');
+  if(fail && fail.size > 5 * 1024 * 1024)
+    return lapor('Gambar terlalu besar. Hadnya 5 MB.', 'no');
+
+  var btn = el('g_btn');
+  btn.disabled = true;
+  btn.textContent = fail ? 'Memuat naik...' : 'Menyimpan...';
+
+  var sedia;
+  if(fail){
+    var nama = Date.now() + '-' +
+               fail.name.replace(/[^A-Za-z0-9._-]/g, '_').slice(-60);
+    sedia = sb.storage.from('awam')
+      .upload(nama, fail, { cacheControl:'3600', upsert:false })
+      .then(function(uu){
+        if(uu.error) throw uu.error;
+        return { url: sb.storage.from('awam').getPublicUrl(nama).data.publicUrl,
+                 path: nama };
+      });
+  } else if(pautan){
+    sedia = Promise.resolve({ url: pautan, path: null });
+  } else {
+    sedia = Promise.resolve(null);
+  }
+
+  sedia.then(function(img){
+    var isi = {
+      tajuk:      tajuk,
+      keterangan: el('g_ket').value.trim() || null,
+      tarikh:     el('g_tarikh').value || hariIni(),
+      susunan:    parseInt(el('g_susunan').value, 10) || 0,
+      papar:      el('g_papar').checked
+    };
+    if(img){ isi.imej_url = img.url; isi.imej_path = img.path; }
+    if(ubah) return sb.from(jadual).update(isi).eq('id', ubah);
+    return sb.from(jadual).insert(isi);
+  }).then(function(r){
+    if(r.error) throw r.error;
+    lapor(ubah ? 'Gambar dikemas kini.' : 'Gambar disimpan.');
+    batalEdit(jadual);
+    muatGaleri();
+  }).catch(function(e){
+    lapor(e && e.message ? e.message : String(e), 'no');
+  }).then(function(){
+    btn.disabled = false;
+    btn.textContent = EDIT[jadual] ? 'Kemas kini gambar' : 'Simpan gambar';
+  });
+}
+window.simpanGaleri = simpanGaleri;
+
+/* ============================================================
+   POSTER BERBILANG (CAROUSEL)
+   POSTER = senarai kerja semasa: [{url, path}, ...]
+   Poster pertama = poster utama, disimpan juga ke imej_url untuk
+   keserasian dengan rekod lama dan og:image.
+   ============================================================ */
+var POSTER = [];
+
+/* Baca poster daripada rekod: sokong imej_urls (baharu) dan imej_url (lama). */
+function posterDariRekod(x){
+  var senarai = [];
+  var arr = x && x.imej_urls;
+  if(typeof arr === 'string'){
+    try{ arr = JSON.parse(arr); }catch(e){ arr = null; }
+  }
+  if(Array.isArray(arr)){
+    arr.forEach(function(it){
+      if(!it) return;
+      if(typeof it === 'string'){ senarai.push({ url: it, path: null }); }
+      else if(it.url){ senarai.push({ url: it.url, path: it.path || null }); }
+    });
+  }
+  /* Rekod lama: hanya ada imej_url tunggal. */
+  if(!senarai.length && x && x.imej_url){
+    senarai.push({ url: x.imej_url, path: x.imej_path || null });
+  }
+  return senarai;
+}
+
+function posterRender(){
+  var wrap = el('p_senaraiWrap'), kotak = el('p_senarai'), bil = el('p_bil');
+  if(!wrap || !kotak) return;
+  if(!POSTER.length){
+    wrap.classList.add('hide');
+    kotak.innerHTML = '';
+    if(bil) bil.textContent = '';
+    return;
+  }
+  wrap.classList.remove('hide');
+  if(bil) bil.textContent = POSTER.length + ' poster';
+  kotak.innerHTML = POSTER.map(function(it, i){
+    return '<div style="display:flex;gap:10px;align-items:center;padding:8px;' +
+        'border:1px solid #2a3a52;border-radius:10px;margin-bottom:8px">' +
+      '<img alt="" src="' + esc(it.url) + '" ' +
+        'style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex:0 0 auto">' +
+      '<div style="flex:1 1 auto;min-width:0">' +
+        '<div style="font-weight:700;font-size:13px">Poster ' + (i + 1) +
+          (i === 0 ? ' <span class="pil papar">Utama</span>' : '') + '</div>' +
+        '<div class="mt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' +
+          esc(it.path || it.url) + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:4px;flex:0 0 auto">' +
+        '<button type="button" class="btn" onclick="posterNaik(' + i + ')"' +
+          (i === 0 ? ' disabled' : '') + ' title="Naik">&uarr;</button>' +
+        '<button type="button" class="btn" onclick="posterTurun(' + i + ')"' +
+          (i === POSTER.length - 1 ? ' disabled' : '') + ' title="Turun">&darr;</button>' +
+        '<button type="button" class="btn" onclick="posterBuang(' + i + ')" ' +
+          'title="Buang">&times;</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function posterNaik(i){
+  if(i <= 0) return;
+  var t = POSTER[i-1]; POSTER[i-1] = POSTER[i]; POSTER[i] = t;
+  posterRender();
+}
+function posterTurun(i){
+  if(i >= POSTER.length - 1) return;
+  var t = POSTER[i+1]; POSTER[i+1] = POSTER[i]; POSTER[i] = t;
+  posterRender();
+}
+function posterBuang(i){ POSTER.splice(i, 1); posterRender(); }
+function posterTambahPautan(){
+  var u = pautanImej(el('p_pautan').value);
+  if(!u) return lapor('Tampal pautan gambar yang sah dahulu.', 'no');
+  POSTER.push({ url: u, path: null });
+  el('p_pautan').value = '';
+  posterRender();
+  lapor('Pautan poster ditambah ke senarai.');
+}
+window.posterNaik = posterNaik;
+window.posterTurun = posterTurun;
+window.posterBuang = posterBuang;
+window.posterTambahPautan = posterTambahPautan;
+
+/* Muat naik satu fail poster ke bucket "awam", pulangkan {url, path}. */
+function posterNaikFail(fail){
+  var nama = 'pengumuman/' + Date.now() + '-' +
+             Math.random().toString(36).slice(2, 7) + '-' +
+             fail.name.replace(/[^A-Za-z0-9._-]/g, '_').slice(-60);
+  return sb.storage.from('awam')
+    .upload(nama, fail, { cacheControl:'3600', upsert:false })
+    .then(function(uu){
+      if(uu.error) throw uu.error;
+      return { url: sb.storage.from('awam').getPublicUrl(nama).data.publicUrl,
+               path: nama };
+    });
+}
+
+function simpanPengumuman(){
+  var jadual = 'awam_pengumuman';
+  var ubah   = EDIT[jadual];
+  var tajuk  = el('p_tajuk').value.trim();
+  var fail   = el('p_fail').files;
+  var pautan = pautanImej(el('p_pautan').value);
+
+  if(!tajuk) return lapor('Tajuk wajib diisi.', 'no');
+
+  /* Pautan yang belum ditekan Tambah tetap diterima supaya tidak hilang. */
+  if(pautan){ POSTER.push({ url: pautan, path: null }); el('p_pautan').value = ''; }
+
+  var senaraiFail = [];
+  for(var i = 0; i < fail.length; i++){
+    if(fail[i].size > 5 * 1024 * 1024)
+      return lapor('Poster "' + fail[i].name + '" terlalu besar. Hadnya 5 MB.', 'no');
+    senaraiFail.push(fail[i]);
+  }
+
+  var btn = el('p_btn');
+  btn.disabled = true;
+  btn.textContent = senaraiFail.length ? 'Memuat naik poster...' : 'Menyimpan...';
+
+  /* Muat naik semua fail baharu, kemudian tambah ke hujung senarai POSTER. */
+  var sedia = senaraiFail.length
+    ? Promise.all(senaraiFail.map(posterNaikFail))
+    : Promise.resolve([]);
+
+  sedia.then(function(baru){
+    baru.forEach(function(it){ POSTER.push(it); });
+    posterRender();
+    var isi = {
+      tajuk:   tajuk,
+      teks:    el('p_teks').value.trim() || null,
+      tarikh:  el('p_tarikh').value || hariIni(),
+      penting: el('p_penting').checked,
+      papar:   el('p_papar').checked,
+      imej_urls: POSTER
+    };
+    /* Poster pertama disimpan juga sebagai imej_url supaya rekod kekal
+       berfungsi dengan kod lama dan og:image. */
+    isi.imej_url  = POSTER.length ? POSTER[0].url : null;
+    isi.imej_path = POSTER.length ? POSTER[0].path : null;
+    if(ubah) return sb.from(jadual).update(isi).eq('id', ubah);
+    return sb.from(jadual).insert(isi);
+  }).then(function(r){
+    if(r.error) throw r.error;
+    lapor(ubah ? 'Pengumuman dikemas kini.' : 'Pengumuman disimpan.');
+    batalEdit(jadual);
+    muatPengumuman();
+  }).catch(function(e){
+    lapor(e && e.message ? e.message : String(e), 'no');
+  }).then(function(){
+    btn.disabled = false;
+    btn.textContent = EDIT[jadual] ? 'Kemas kini pengumuman' : 'Simpan pengumuman';
+  });
+}
+window.simpanPengumuman = simpanPengumuman;
+
+function simpanAcara(){
+  var jadual = 'awam_acara';
+  var ubah   = EDIT[jadual];
+  var nama   = el('a_nama').value.trim();
+  var mula   = el('a_mula').value;
+  var akhir  = el('a_tamat').value;
+  if(!nama) return lapor('Nama aktiviti wajib diisi.', 'no');
+  if(!mula) return lapor('Tarikh mula wajib diisi.', 'no');
+  if(akhir && akhir < mula)
+    return lapor('Tarikh tamat tidak boleh lebih awal daripada tarikh mula.', 'no');
+
+  var isi = {
+    nama:         nama,
+    tarikh_mula:  mula,
+    tarikh_tamat: akhir || null,
+    lokasi:       el('a_lokasi').value.trim() || null,
+    keterangan:   el('a_ket').value.trim() || null,
+    papar:        el('a_papar').checked
+  };
+  var kerja = ubah ? sb.from(jadual).update(isi).eq('id', ubah)
+                   : sb.from(jadual).insert(isi);
+  kerja.then(function(r){
+    if(r.error) return lapor(r.error.message, 'no');
+    lapor(ubah ? 'Aktiviti dikemas kini.' : 'Aktiviti disimpan.');
+    batalEdit(jadual);
+    muatAcara();
+  });
+}
+window.simpanAcara = simpanAcara;
+
+/* --------------------- PAPAR / PADAM -------------------- */
+function togolPapar(jadual, id, nilai){
+  sb.from(jadual).update({ papar: nilai }).eq('id', id).then(function(r){
+    if(r.error) return lapor(r.error.message, 'no');
+    lapor(nilai ? 'Dipaparkan kepada pengunjung.' : 'Disorokkan daripada pengunjung.');
+    muatSemua();
+  });
+}
+window.togolPapar = togolPapar;
+
+function padam(jadual, id){
+  if(!confirm('Padam rekod ini? Tindakan ini tidak boleh dibatalkan.')) return;
+  sb.from(jadual).delete().eq('id', id).then(function(r){
+    if(r.error) return lapor(r.error.message, 'no');
+    lapor('Rekod dipadam.');
+    muatSemua();
+  });
+}
+window.padam = padam;
+
+/* Satu pendengar berwakil untuk semua butang senarai. Cara ini
+   mengelak petik bersarang dalam atribut onclick, dan kekal
+   berfungsi walaupun senarai dijana semula selepas setiap simpan. */
+document.addEventListener('click', function(ev){
+  var b = ev.target && ev.target.closest ? ev.target.closest('button') : null;
+  if(!b) return;
+  var j  = b.getAttribute('data-j');
+  var id = b.getAttribute('data-id');
+  if(b.classList.contains('act-batal')){
+    if(j) batalEdit(j);
+    return;
+  }
+  if(!j || !id) return;
+  if(b.classList.contains('act-edit')){
+    bukaEdit(j, id);
+  } else if(b.classList.contains('act-togol')){
+    togolPapar(j, id, b.getAttribute('data-v') === '1');
+  } else if(b.classList.contains('act-padam')){
+    padam(j, id);
+  }
+});
+
+</script>
+
+</body>
+</html>
